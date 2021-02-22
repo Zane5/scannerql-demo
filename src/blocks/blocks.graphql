@@ -1,0 +1,144 @@
+scalar Date
+
+type DateTime {
+  date: Date
+}
+
+type Number {
+  int: Int
+}
+
+interface Node {
+  id: ID!
+}
+
+type TimeRange {
+  start: DateTime!
+  end: DateTime!
+  isInPast: Boolean!
+}
+
+type Image implements Node {
+  id: ID!
+}
+
+type Age {
+  age: DateTime!
+}
+
+type Hash {
+  hash: String!
+}
+
+type Account {
+  account: Hash!
+  totalBalance: Number!
+  freeBalance: Number!
+  nonce: Number!
+  active: Boolean
+}
+
+type Block implements Node {
+  id: ID!
+  number: String!
+  age: Age!
+  hash: Hash!
+  parentHash: String!
+  stateRoot: Hash!
+  ExtrinsicsRoot: Hash!
+  transactions: String!
+  signedExtrinsics: Number!
+  moduleEvents: Number!
+  runtimeVersions: String!
+  sessionID: Number
+  blockAuthor: Hash!
+}
+
+type BlocksConnection {
+  edges: [BlockEdge!]!
+  pageInfo: PageInfo!
+}
+
+type BlockEdge {
+  cursor: String!
+  node: Block!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type CollectionBlocks implements Node {
+  id: ID!
+  ruleSet: CollectionBlocksRuleSet
+  blocks: BlocksConnection!
+  collectionTitle: String!
+  image: Image
+}
+
+type CollectionBlocksRuleSet {
+  rules: [CollectionBlocksRule!]!
+  appliesDisjunctively: Boolean!
+}
+
+type CollectionBlocksRule {
+  field: CollectionRuleField
+  relation: CollectionRuleRelation
+  timeRange: TimeRange!
+  value: String!
+}
+
+enum CollectionRuleField {
+  TAG
+  HASH
+  TYPE
+}
+
+enum CollectionRuleRelation {
+  CONTAINS
+  ENDS_WITH
+  EQUALS
+  GREATER_THAN
+  LESS_THAN
+  NOT_CONTAINS
+  NOT_EQUALS
+  STARTS_WITH
+}
+
+type LastBlock {
+  blocks: CollectionBlocks
+  timeRange: TimeRange!
+}
+
+type Transfer {
+  from: Account!
+  to: Account!
+  value: Number!
+  free: Number!
+  eventID: String!
+}
+
+type LastBalanceTransfers {
+  transfer: Transfer
+}
+
+type Query {
+  getBlocks: LastBlock
+  block(id: ID!): Block
+  lastBlock: LastBlock
+  lastBalanceTransfers: LastBalanceTransfers
+}
+
+type Mutation {
+  createBlock(createBlockInput: CreateBlockInput): Block
+}
+
+type Subscription {
+  blockCreated: Block
+}
+
+input CreateBlockInput {
+  hash: String
+  head: String
+}
